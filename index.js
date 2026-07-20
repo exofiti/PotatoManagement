@@ -1,7 +1,7 @@
 'use strict';
 
 // dotenv 는 config.js 에서 로드됩니다.
-const { Client, EmbedBuilder, GatewayIntentBits, PermissionFlagsBits } = require('discord.js');
+const { Client, EmbedBuilder, GatewayIntentBits, MessageFlags, PermissionFlagsBits } = require('discord.js');
 const { loadConfig } = require('./config');
 const {
     logDonation, getDonationsByNickname, getRecentDonations, getDonationSummary,
@@ -50,14 +50,22 @@ async function sendServerCommand(channel, command) {
     await channel.send({ content: command, allowedMentions: { parse: [] } });
 }
 
+// 이미 만료(10062)되었거나 응답된(40060) 인터랙션은 더 손댈 수 없으므로 무시한다.
+const IGNORABLE_INTERACTION_CODES = new Set([10062, 40060]);
+
 async function reportError(interaction) {
     const message = '처리 중 오류가 발생했습니다. 로그를 확인해주세요.';
-    if (interaction.deferred) await interaction.editReply(message);
-    else if (interaction.replied) await interaction.followUp({ content: message, ephemeral: true });
-    else await interaction.reply({ content: message, ephemeral: true });
+    try {
+        if (interaction.deferred) await interaction.editReply(message);
+        else if (interaction.replied) await interaction.followUp({ content: message, flags: MessageFlags.Ephemeral });
+        else await interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
+    } catch (error) {
+        if (IGNORABLE_INTERACTION_CODES.has(error?.code)) return;
+        throw error;
+    }
 }
 
-client.once('ready', readyClient => {
+client.once('clientReady', readyClient => {
     console.log(`${readyClient.user.tag} 관리봇 연결됨 (시즌: ${config.currentSeason})`);
 });
 
@@ -69,7 +77,7 @@ client.on('interactionCreate', async interaction => {
 
     try {
         if (!isAuthorized(interaction)) {
-            await interaction.reply({ content: '이 명령을 실행할 권한이 없습니다.', ephemeral: true });
+            await interaction.reply({ content: '이 명령을 실행할 권한이 없습니다.', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -112,11 +120,11 @@ async function handleBan(interaction) {
     const reason = interaction.options.getString('사유', true);
 
     if (!isValidMinecraftName(nickname)) {
-        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', ephemeral: true });
+        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', flags: MessageFlags.Ephemeral });
         return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     const channel = await getCommandChannel();
     await sendServerCommand(channel, `ban ${nickname}`);
     await interaction.editReply(`${nickname}님을 밴했습니다.`);
@@ -141,15 +149,15 @@ async function handleDonation(interaction) {
     const group = donationGroup(amount);
 
     if (!isValidMinecraftName(nickname)) {
-        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', ephemeral: true });
+        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', flags: MessageFlags.Ephemeral });
         return;
     }
     if (!group) {
-        await interaction.reply({ content: '최소 후원 금액은 5,000원입니다.', ephemeral: true });
+        await interaction.reply({ content: '최소 후원 금액은 5,000원입니다.', flags: MessageFlags.Ephemeral });
         return;
     }
     if (!isValidTitle(title)) {
-        await interaction.reply({ content: '칭호는 따옴표, 역슬래시, 줄바꿈을 제외한 1~32자여야 합니다.', ephemeral: true });
+        await interaction.reply({ content: '칭호는 따옴표, 역슬래시, 줄바꿈을 제외한 1~32자여야 합니다.', flags: MessageFlags.Ephemeral });
         return;
     }
 
@@ -188,7 +196,7 @@ async function handleDonation(interaction) {
 async function handleLookup(interaction) {
     const nickname = interaction.options.getString('닉네임');
     if (nickname && !isValidMinecraftName(nickname)) {
-        await interaction.reply({ content: 'Minecraft 닉네임 형식이 올바르지 않습니다.', ephemeral: true });
+        await interaction.reply({ content: 'Minecraft 닉네임 형식이 올바르지 않습니다.', flags: MessageFlags.Ephemeral });
         return;
     }
 
@@ -266,15 +274,15 @@ async function handlePunish(interaction) {
     const reason = interaction.options.getString('사유', true).trim();
 
     if (!listPresets().some(preset => preset.key === severity)) {
-        await interaction.reply({ content: '알 수 없는 처벌 강도입니다.', ephemeral: true });
+        await interaction.reply({ content: '알 수 없는 처벌 강도입니다.', flags: MessageFlags.Ephemeral });
         return;
     }
     if (!isValidReason(reason)) {
-        await interaction.reply({ content: '사유는 따옴표, 역슬래시, 줄바꿈을 제외한 1~500자여야 합니다.', ephemeral: true });
+        await interaction.reply({ content: '사유는 따옴표, 역슬래시, 줄바꿈을 제외한 1~500자여야 합니다.', flags: MessageFlags.Ephemeral });
         return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const target = await resolveTarget(interaction);
     if (!target) {
@@ -343,7 +351,7 @@ async function handlePunish(interaction) {
 }
 
 async function handleWhois(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const target = await resolveTarget(interaction);
     if (!target) {
@@ -402,10 +410,10 @@ function formatPunishmentLine(record) {
 }
 
 async function handleImportLogs(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const limit = interaction.options.getInteger('개수') || 100;
-    const channelOption = interaction.options.getChannel('���널');
+    const channelOption = interaction.options.getChannel('채널');
     const channelId = channelOption?.id || config.punishmentLogChannelId;
 
     if (!channelId) {
@@ -452,11 +460,11 @@ async function handleLinkAccount(interaction) {
     const nickname = interaction.options.getString('닉네임', true).trim();
 
     if (!isValidMinecraftName(nickname)) {
-        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', ephemeral: true });
+        await interaction.reply({ content: 'Minecraft 닉네임은 영문, 숫자, 밑줄로 구성된 3~16자여야 합니다.', flags: MessageFlags.Ephemeral });
         return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const profile = await nameToProfile(nickname).catch(() => null);
     upsertAccountLink({
