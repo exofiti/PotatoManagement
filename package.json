@@ -7,7 +7,7 @@
     "deploy": "node deploy-commands.js",
     "smoke": "node test/smoke.js && node test/punishments.smoke.js",
     "start": "node index.js",
-    "test": "npm run check && npm run smoke && node --test test/validation.test.js test/punishments.test.js test/verifySource.test.js"
+    "test": "pnpm run check && pnpm run smoke && node --test test/validation.test.js test/punishments.test.js test/verifySource.test.js"
   },
   "allowScripts": {
     "better-sqlite3": true

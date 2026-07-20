@@ -7,7 +7,13 @@ __v0_jsx-dev-runtime.ts
 .vercel/
 
 # Environment variables
-.env*.local
+.env
+.env.*
+!.env.example
+
+# Lock files — pnpm-lock.yaml 을 단일 lock 파일로 사용합니다.
+package-lock.json
+yarn.lock
 
 # Common ignores
 node_modules
