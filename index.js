@@ -106,6 +106,14 @@ client.on('interactionCreate', async interaction => {
         if (subcommand === '처리') await handleDonation(interaction);
         else if (subcommand === '조회') await handleLookup(interaction);
     } catch (error) {
+        // 만료(10062)/중복 응답(40060) 인터랙션은 복구 불가하므로 한 줄만 남기고 넘어간다.
+        if (IGNORABLE_INTERACTION_CODES.has(error?.code)) {
+            console.warn(
+                `인터랙션 만료/중복 응답 (code ${error.code}) — /${interaction.commandName}. ` +
+                '봇이 중복 실행 중이거나 서버 시계가 어긋났는지 확인하세요.'
+            );
+            return;
+        }
         console.error('명령 처리 실패:', error);
         try {
             await reportError(interaction);
