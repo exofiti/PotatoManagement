@@ -3,3 +3,6 @@ packages:
 
 allowBuilds:
   better-sqlite3: true
+
+overrides:
+  '@discordjs/rest': 2.6.2

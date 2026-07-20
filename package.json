@@ -9,9 +9,6 @@
     "start": "node index.js",
     "test": "pnpm run check && pnpm run smoke && node --test test/validation.test.js test/punishments.test.js test/verifySource.test.js"
   },
-  "allowScripts": {
-    "better-sqlite3": true
-  },
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "discord.js": "^14.15.3",
