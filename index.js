@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const { Client, EmbedBuilder, GatewayIntentBits, PermissionFlagsBits } = require('discord.js');
 const { loadConfig } = require('./config');
 const {

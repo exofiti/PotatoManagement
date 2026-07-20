@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const requiredVariables = ['DISCORD_TOKEN', 'DISCORD_CLIENT_ID', 'DISCORD_COMMAND_CHANNEL_ID'];
 
 function loadConfig(env = process.env) {
