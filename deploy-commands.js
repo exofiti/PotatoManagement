@@ -51,15 +51,6 @@ const commands = [
         .addStringOption(option => option
             .setName('닉네임').setDescription('마크 닉네임으로 조회'))),
     restrictByDefault(new SlashCommandBuilder()
-        .setName('처벌기록')
-        .setDescription('시즌별 처벌 기록을 조회합니다')
-        .addStringOption(option => option
-            .setName('시즌').setDescription('시즌 값 (비우면 현재 시즌, "전체" 입력 시 전체)'))
-        .addUserOption(option => option
-            .setName('디코id').setDescription('특정 Discord 유저로 필터'))
-        .addStringOption(option => option
-            .setName('닉네임').setDescription('특정 마크 닉네임으로 필터'))),
-    restrictByDefault(new SlashCommandBuilder()
         .setName('처벌가져오기')
         .setDescription('채널에 쌓인 처벌 로그를 파싱해 현재 시즌 DB로 가져옵니다')
         .addIntegerOption(option => option

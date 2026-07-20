@@ -60,7 +60,7 @@ client.once('ready', readyClient => {
     console.log(`${readyClient.user.tag} 관리봇 연결됨 (시즌: ${config.currentSeason})`);
 });
 
-const HANDLED_COMMANDS = ['후원', 'ban', '처분', 'whois', '처벌기록', '처벌가져오기', '연동등록'];
+const HANDLED_COMMANDS = ['후원', 'ban', '처분', 'whois', '처벌가져오기', '연동등록'];
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -82,10 +82,6 @@ client.on('interactionCreate', async interaction => {
         }
         if (interaction.commandName === 'whois') {
             await handleWhois(interaction);
-            return;
-        }
-        if (interaction.commandName === '처벌기록') {
-            await handlePunishmentHistory(interaction);
             return;
         }
         if (interaction.commandName === '처벌가져오기') {
@@ -402,35 +398,6 @@ function formatPunishmentLine(record) {
     const when = (record.punished_at || record.created_at || '').slice(0, 16);
     const name = record.minecraft_name || record.discord_user_id || '?';
     return `• [${record.season}] ${when} — ${name} / ${severityLabel(record.severity)} / ${record.reason}`;
-}
-
-async function handlePunishmentHistory(interaction) {
-    await interaction.deferReply({ ephemeral: true });
-
-    const seasonOption = interaction.options.getString('시즌');
-    const season = seasonOption === '전체' ? undefined : (seasonOption || config.currentSeason);
-    const discordUser = interaction.options.getUser('디코id');
-    const nameOption = interaction.options.getString('닉네임');
-
-    const records = getPunishments({
-        season,
-        discordUserId: discordUser?.id,
-        minecraftName: nameOption || undefined,
-        limit: 15,
-    });
-
-    if (records.length === 0) {
-        await interaction.editReply('조건에 맞는 처벌 기록이 없습니다.');
-        return;
-    }
-
-    const scope = season ? `시즌 ${season}` : '전체 시즌';
-    const embed = new EmbedBuilder()
-        .setTitle(`처벌 기록 (${scope})`)
-        .setColor(0xfaa61a)
-        .setDescription(records.map(formatPunishmentLine).join('\n').slice(0, 4000));
-
-    await interaction.editReply({ embeds: [embed] });
 }
 
 async function handleImportLogs(interaction) {
