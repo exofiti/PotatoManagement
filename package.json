@@ -1,38 +1,19 @@
 {
-  "name": "my-project",
-  "version": "0.1.0",
-  "private": true,
+  "name": "donation-bot",
+  "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint ."
+    "check": "node --check index.js && node --check deploy-commands.js && node --check config.js && node --check db.js && node --check lib/validation.js && node --check test/smoke.js && node --check test/validation.test.js",
+    "deploy": "node deploy-commands.js",
+    "smoke": "node test/smoke.js",
+    "start": "node index.js",
+    "test": "npm run check && npm run smoke && node --test test/validation.test.js"
+  },
+  "allowScripts": {
+    "better-sqlite3": true
   },
   "dependencies": {
-    "@base-ui/react": "^1.5.0",
-    "@vercel/analytics": "1.6.1",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
-    "next": "16.2.6",
-    "react": "^19",
-    "react-dom": "^19",
-    "shadcn": "^4.8.0",
-    "tailwind-merge": "^3.3.1",
-    "tw-animate-css": "^1.4.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^24",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "postcss": "^8.5",
-    "tailwindcss": "^4.3.3",
-    "typescript": "5.7.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "hono": "4.12.25"
-    }
+    "better-sqlite3": "^11.3.0",
+    "discord.js": "^14.15.3"
   }
 }
