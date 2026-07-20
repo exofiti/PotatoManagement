@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const { ChannelType, PermissionFlagsBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const { loadConfig } = require('./config');
 const { listPresets } = require('./lib/punishments');
@@ -70,8 +72,24 @@ const rest = new REST({ version: '10' }).setToken(config.token);
 
 (async () => {
     try {
-        await rest.put(Routes.applicationCommands(config.clientId), { body: commands });
-        console.log('슬래시 명령 등록 완료');
+        if (config.guildId) {
+            // 길드 등록: 즉시 반영됩니다. (개발/단일 서버 운영에 권장)
+            await rest.put(
+                Routes.applicationGuildCommands(config.clientId, config.guildId),
+                { body: commands }
+            );
+            console.log(`슬래시 명령 ${commands.length}개를 길드(${config.guildId})에 등록 완료 (즉시 반영)`);
+        } else {
+            // 글로벌 등록: Discord 전파에 최대 1시간이 걸릴 수 있습니다.
+            await rest.put(
+                Routes.applicationCommands(config.clientId),
+                { body: commands }
+            );
+            console.log(
+                `슬래시 명령 ${commands.length}개를 글로벌로 등록 완료. ` +
+                '반영까지 최대 1시간 걸릴 수 있습니다. 즉시 반영하려면 .env 에 DISCORD_GUILD_ID 를 설정하세요.'
+            );
+        }
     } catch (error) {
         console.error('슬래시 명령 등록 실패:', error);
         process.exitCode = 1;

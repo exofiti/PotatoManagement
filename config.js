@@ -13,6 +13,7 @@ function loadConfig(env = process.env) {
     return {
         token: env.DISCORD_TOKEN.trim(),
         clientId: env.DISCORD_CLIENT_ID.trim(),
+        guildId: env.DISCORD_GUILD_ID?.trim() || null,
         commandChannelId: env.DISCORD_COMMAND_CHANNEL_ID.trim(),
         logChannelId: env.DISCORD_LOG_CHANNEL_ID?.trim() || null,
         currentSeason: env.CURRENT_SEASON?.trim() || 'S1',

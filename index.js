@@ -1,7 +1,6 @@
 'use strict';
 
-require('dotenv').config();
-
+// dotenv 는 config.js 에서 로드됩니다.
 const { Client, EmbedBuilder, GatewayIntentBits, PermissionFlagsBits } = require('discord.js');
 const { loadConfig } = require('./config');
 const {
@@ -406,7 +405,7 @@ async function handleImportLogs(interaction) {
     await interaction.deferReply({ ephemeral: true });
 
     const limit = interaction.options.getInteger('개수') || 100;
-    const channelOption = interaction.options.getChannel('채널');
+    const channelOption = interaction.options.getChannel('���널');
     const channelId = channelOption?.id || config.punishmentLogChannelId;
 
     if (!channelId) {
