@@ -1,0 +1,20 @@
+{
+  "name": "potato-management-bot",
+  "version": "1.1.0",
+  "main": "index.js",
+  "scripts": {
+    "check": "node --check index.js && node --check deploy-commands.js && node --check config.js && node --check db.js && node --check lib/validation.js && node --check lib/punishments.js && node --check lib/mojang.js && node --check lib/accounts.js && node --check lib/verifySource.js && node --check lib/logParser.js && node --check test/smoke.js && node --check test/punishments.smoke.js && node --check test/validation.test.js && node --check test/punishments.test.js && node --check test/verifySource.test.js",
+    "deploy": "node deploy-commands.js",
+    "smoke": "node test/smoke.js && node test/punishments.smoke.js",
+    "start": "node index.js",
+    "test": "npm run check && npm run smoke && node --test test/validation.test.js test/punishments.test.js test/verifySource.test.js"
+  },
+  "allowScripts": {
+    "better-sqlite3": true
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  }
+}
