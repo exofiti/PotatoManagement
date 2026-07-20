@@ -13,6 +13,8 @@ function loadConfig(env = process.env) {
         clientId: env.DISCORD_CLIENT_ID.trim(),
         commandChannelId: env.DISCORD_COMMAND_CHANNEL_ID.trim(),
         logChannelId: env.DISCORD_LOG_CHANNEL_ID?.trim() || null,
+        currentSeason: env.CURRENT_SEASON?.trim() || 'S1',
+        punishmentLogChannelId: env.DISCORD_PUNISHMENT_LOG_CHANNEL_ID?.trim() || null,
         allowedRoleIds: new Set(
             (env.DISCORD_ALLOWED_ROLE_IDS || '')
                 .split(',')
